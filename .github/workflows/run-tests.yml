@@ -1,0 +1,66 @@
+name: PHPUnit Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - "*"
+  schedule:
+  - cron: '0 0 * * *'
+
+jobs:
+  php-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: [ 8.1, 8.0, 7.4 ]
+        hyperf: [ ^1.0, ^2.0 ]
+        dependency-version: [prefer-lowest, prefer-stable, dev]
+        exclude:
+          - hyperf: ^1.0
+            php: 8.0
+          - hyperf: ^1.0
+            php: 8.1
+        include:
+          - hyperf: ^2.0.0
+            php: 8.0
+          - hyperf: ^2.1.0
+            php: 8.1
+      fail-fast: false
+
+    name: Test on PHP${{ matrix.php }} - Hyperf-${{ matrix.hyperf }} - ${{ matrix.dependency-version }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: swoole-4.8.7
+          tools: phpize, composer:v2
+          ini-values: opcache.enable_cli=1, swoole.use_shortname='Off'
+          coverage: none
+
+      - name: Install Swoole
+        run: |
+          php --ri swoole
+
+      - name: Install Packages
+        run: |
+          composer require "hyperf/di:${{ matrix.hyperf }}" --no-interaction --no-update
+          composer require "hyperf/http-server:${{ matrix.hyperf }}" --no-interaction --no-update
+          composer require "hyperf/config:${{ matrix.hyperf }}" --dev --no-interaction --no-update
+          composer require "hyperf/testing:${{ matrix.hyperf }}" --dev --no-interaction --no-update
+          composer require "hyperf/validation:${{ matrix.hyperf }}" --dev --no-interaction --no-update
+          composer update --${{ matrix.dependency-version }} --prefer-dist --no-progress
+
+      - name: Run Scripts Before Test
+        run: cp phpunit.xml.dist phpunit.xml
+
+      - name: Run Test Cases
+        run: |
+          composer test
