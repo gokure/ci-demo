@@ -10,7 +10,6 @@ declare(strict_types=1);
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 use Hyperf\Config\Listener\RegisterPropertyHandlerListener;
-use Hyperf\Di\Aop\AstVisitorRegistry;
 use Hyperf\Di\Aop\PropertyHandlerVisitor;
 use Hyperf\Di\Aop\ProxyCallVisitor;
 use Hyperf\Di\Aop\RegisterInjectPropertyHandler;
@@ -20,9 +19,11 @@ use Hyperf\Di\Aop\RegisterInjectPropertyHandler;
 
 require_once BASE_PATH . '/vendor/autoload.php';
 
-// Register AST visitors to the collector.
-AstVisitorRegistry::insert(PropertyHandlerVisitor::class, PHP_INT_MAX / 2);
-AstVisitorRegistry::insert(ProxyCallVisitor::class, PHP_INT_MAX / 2);
+if (class_exists(\Hyperf\Di\Aop\AstVisitorRegistry::class)) {
+    // Register AST visitors to the collector.
+    \Hyperf\Di\Aop\AstVisitorRegistry::insert(PropertyHandlerVisitor::class, PHP_INT_MAX / 2);
+    \Hyperf\Di\Aop\AstVisitorRegistry::insert(ProxyCallVisitor::class, PHP_INT_MAX / 2);
+}
 
 // Register Property Handler.
 RegisterInjectPropertyHandler::register();
