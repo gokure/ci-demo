@@ -123,7 +123,9 @@ class TestCase extends BaseTestCase
         $container->shouldReceive('make')->with(CoreMiddleware::class, Mockery::any())->andReturnUsing(function ($class, $args) {
             return new CoreMiddleware(...array_values($args));
         });
-        $container->shouldReceive('get')->with(Waiter::class)->andReturn(new Waiter());
+        if (class_exists(Waiter::class)) {
+            $container->shouldReceive('get')->with(Waiter::class)->andReturn(new Waiter());
+        }
         ApplicationContext::setContainer($container);
 
         Router::init($factory);
