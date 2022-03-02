@@ -15,9 +15,12 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php: [ 7.4 ]
+        php: [ 7.4, 8.0, 8.1 ]
         hyperf: [ ^2.0 ]
         dependency-version: [prefer-lowest, prefer-stable]
+        include:
+          - hyperf: 3.0.x-dev
+            php: 8.0
       fail-fast: false
 
     name: Test on PHP${{ matrix.php }} - Hyperf-${{ matrix.hyperf }} - ${{ matrix.dependency-version }}
