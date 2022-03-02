@@ -15,18 +15,10 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php: [ 8.1, 8.0, 7.4 ]
-        hyperf: [ ^1.0, ^2.0 ]
-        dependency-version: [prefer-lowest, prefer-stable, dev]
-        exclude:
-          - hyperf: ^1.0
-            php: 8.0
-          - hyperf: ^1.0
-            php: 8.1
+        php: [ 7.4 ]
+        hyperf: [ ^1.0 ]
+        dependency-version: [prefer-lowest, prefer-stable]
       fail-fast: false
-
-    env:
-      SW_VERSION: 'v4.8.7'
 
     name: Test on PHP${{ matrix.php }} - Hyperf-${{ matrix.hyperf }} - ${{ matrix.dependency-version }}
 
@@ -38,26 +30,10 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
+          extensions: swoole
           tools: phpize, composer:v2
-          ini-values: opcache.enable_cli=1
+          ini-values: opcache.enable_cli=1, swoole.use_shortname=Off
           coverage: none
-
-      - name: Setup Swoole
-        run: |
-          sudo apt-get update
-          sudo apt-get install libcurl4-openssl-dev
-          wget https://github.com/swoole/swoole-src/archive/${SW_VERSION}.tar.gz -O swoole.tar.gz
-          mkdir -p swoole
-          tar -xf swoole.tar.gz -C swoole --strip-components=1
-          rm swoole.tar.gz
-          cd swoole
-          phpize
-          ./configure --enable-openssl --enable-http2 --enable-swoole-curl --enable-swoole-json
-          make -j$(nproc)
-          sudo make install
-          sudo sh -c "echo extension=swoole > /etc/php/${{ matrix.php }}/cli/conf.d/swoole.ini"
-          sudo sh -c "echo swoole.use_shortname='Off' >> /etc/php/${{ matrix.php }}/cli/conf.d/swoole.ini"
-          php --ri swoole
 
       - name: Setup Packages
         run: |
