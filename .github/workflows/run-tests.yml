@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         php: [ 7.4 ]
-        hyperf: [ ^1.0 ]
+        hyperf: [ ^2.0 ]
         dependency-version: [prefer-lowest, prefer-stable]
       fail-fast: false
 
