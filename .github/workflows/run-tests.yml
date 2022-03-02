@@ -45,7 +45,7 @@ jobs:
           composer require "hyperf/config:${{ matrix.hyperf }}" --dev --no-interaction --no-update
           composer require "hyperf/testing:${{ matrix.hyperf }}" --dev --no-interaction --no-update
           composer require "hyperf/validation:${{ matrix.hyperf }}" --dev --no-interaction --no-update
-          composer update --${{ matrix.dependency-version }} --prefer-dist --no-progress
+          composer update --${{ matrix.dependency-version }} --prefer-dist
 
       - name: Run Scripts Before Test
         run: cp phpunit.xml.dist phpunit.xml
