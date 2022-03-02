@@ -12,7 +12,6 @@ declare(strict_types=1);
 use Hyperf\Config\Listener\RegisterPropertyHandlerListener;
 use Hyperf\Di\Aop\PropertyHandlerVisitor;
 use Hyperf\Di\Aop\ProxyCallVisitor;
-use Hyperf\Di\Aop\RegisterInjectPropertyHandler;
 
 ! defined('BASE_PATH') && define('BASE_PATH', dirname(__DIR__, 1));
 ! defined('SWOOLE_HOOK_FLAGS') && define('SWOOLE_HOOK_FLAGS', SWOOLE_HOOK_ALL);
@@ -25,7 +24,9 @@ if (class_exists(\Hyperf\Di\Aop\AstVisitorRegistry::class)) {
     \Hyperf\Di\Aop\AstVisitorRegistry::insert(ProxyCallVisitor::class, PHP_INT_MAX / 2);
 }
 
-// Register Property Handler.
-RegisterInjectPropertyHandler::register();
+if (class_exists(\Hyperf\Di\Aop\RegisterInjectPropertyHandler::class)) {
+    // Register Property Handler.
+    \Hyperf\Di\Aop\RegisterInjectPropertyHandler::register();
+}
 
 (new RegisterPropertyHandlerListener())->process(new \stdClass());
